@@ -1,0 +1,4 @@
+docs
+.env
+scripts/
+node_modules/
