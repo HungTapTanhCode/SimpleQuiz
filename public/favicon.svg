@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Simple Quiz">
+  <rect width="64" height="64" rx="14" fill="#2457d6"/>
+  <path d="M18 18h21c7 0 11 4 11 10 0 5-3 8-7 9l8 9h-9l-7-8h-9v8h-8V18zm8 7v7h12c3 0 5-1 5-4s-2-3-5-3H26z" fill="#fff"/>
+  <circle cx="48" cy="48" r="5" fill="#e46b42"/>
+</svg>

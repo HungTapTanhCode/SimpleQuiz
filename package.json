@@ -1,0 +1,24 @@
+{
+  "name": "simplequiz",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "dev": "nodemon ./bin/www",
+    "client:dev": "npm --prefix client run dev",
+    "client:build": "npm --prefix client run build",
+    "build": "npm run client:build",
+    "seed": "node ./scripts/seed-asm04.js"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "debug": "^4.4.3",
+    "dotenv": "^18.0.9",
+    "express": "^5.3.0",
+    "http-errors": "^2.0.1",
+    "mongoose": "^9.11.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

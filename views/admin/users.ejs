@@ -1,0 +1,16 @@
+<%- include('../partials/header.hbs') %>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+  <div><p class="eyebrow mb-1">Administration</p><h1 class="h2 mb-1">Registered users</h1><p class="text-secondary mb-0">Review accounts and their assigned access level.</p></div>
+  <div class="user-summary"><span><strong><%= users.length %></strong> total</span><span><strong><%= users.filter(user => user.admin).length %></strong> admins</span></div>
+</div>
+<div class="table-responsive bg-white border rounded-3">
+  <table class="table align-middle mb-0">
+    <thead><tr><th>User</th><th>Role</th><th>Created</th><th class="text-end">Identifier</th></tr></thead>
+    <tbody>
+      <% users.forEach(user => { %>
+        <tr><td><div class="user-name-cell"><span class="user-avatar"><%= (user.username || '?').charAt(0).toUpperCase() %></span><div><strong><%= user.username || '(empty username)' %></strong><small>Registered account</small></div></div></td><td><span class="role-badge <%= user.admin ? 'role-admin' : 'role-author' %>"><%= user.admin ? 'Admin' : 'Author' %></span></td><td class="text-secondary"><%= user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '—' %></td><td class="text-end"><code class="user-id"><%= user._id %></code></td></tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+<%- include('../partials/footer.hbs') %>

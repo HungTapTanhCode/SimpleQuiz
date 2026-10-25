@@ -1,0 +1,114 @@
+{
+  "info": {
+    "name": "SimpleQuiz ASM03 - User Authentication",
+    "description": "Assignment 3 test flow: Author/Admin registration, JWT login, Quiz role permissions, Question ownership and Admin users API.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "apiUrl", "value": "http://localhost:3000/api" }
+  ],
+  "item": [
+    {
+      "name": "01 - Register and Login",
+      "item": [
+        {
+          "name": "Register Author",
+          "event": [
+            { "listen": "prerequest", "script": { "type": "text/javascript", "exec": ["pm.environment.set('runId', Date.now().toString());", "pm.environment.set('authorUsername', 'author_' + pm.environment.get('runId'));" ] } },
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Author created', () => pm.response.to.have.status(201));", "pm.expect(pm.response.json().user.admin).to.eql(false);", "pm.environment.set('authorId', pm.response.json().user.id);" ] } }
+          ],
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"username\": \"{{authorUsername}}\",\n  \"password\": \"{{authorPassword}}\"\n}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/auth/register" }
+        },
+        {
+          "name": "Register Admin",
+          "event": [
+            { "listen": "prerequest", "script": { "type": "text/javascript", "exec": ["pm.environment.set('adminUsername', 'admin_' + pm.environment.get('runId'));" ] } },
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Admin created', () => pm.response.to.have.status(201));", "pm.expect(pm.response.json().user.admin).to.eql(true);", "pm.environment.set('adminId', pm.response.json().user.id);" ] } }
+          ],
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"username\": \"{{adminUsername}}\",\n  \"password\": \"{{adminPassword}}\",\n  \"admin\": true\n}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/auth/register" }
+        },
+        {
+          "name": "Login Author",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Author login', () => pm.response.to.have.status(200));", "pm.environment.set('authorToken', pm.response.json().token);" ] } }],
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"username\": \"{{authorUsername}}\",\n  \"password\": \"{{authorPassword}}\"\n}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/auth/login" }
+        },
+        {
+          "name": "Login Admin",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Admin login', () => pm.response.to.have.status(200));", "pm.expect(pm.response.json().user.admin).to.eql(true);", "pm.environment.set('adminToken', pm.response.json().token);" ] } }],
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"username\": \"{{adminUsername}}\",\n  \"password\": \"{{adminPassword}}\"\n}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/auth/login" }
+        }
+      ]
+    },
+    {
+      "name": "02 - Question Ownership",
+      "item": [
+        {
+          "name": "Author creates Question",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Question created', () => pm.response.to.have.status(201));", "pm.expect(pm.response.json().author).to.eql(pm.environment.get('authorId'));", "pm.environment.set('questionId', pm.response.json()._id);" ] } }],
+          "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{authorToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"text\": \"What is the capital of France?\",\n  \"options\": [\"Paris\", \"London\", \"Berlin\", \"Madrid\"],\n  \"keywords\": [\"geography\", \"europe\"],\n  \"correctAnswerIndex\": 0\n}", "options": { "raw": { "language": "json" } } }, "url": "{{apiUrl}}/questions" }
+        },
+        {
+          "name": "Author updates own Question",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Author can update own question', () => pm.response.to.have.status(200));" ] } }],
+          "request": { "method": "PUT", "header": [{ "key": "Authorization", "value": "Bearer {{authorToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"text\": \"Updated capital question\",\n  \"options\": [\"Paris\", \"London\", \"Berlin\"],\n  \"keywords\": [\"updated\"],\n  \"correctAnswerIndex\": 0\n}", "options": { "raw": { "language": "json" } } }, "url": "{{apiUrl}}/questions/{{questionId}}" }
+        },
+        {
+          "name": "Admin cannot update Author Question",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Admin blocked by ownership', () => pm.response.to.have.status(403));", "pm.expect(pm.response.json().message).to.eql('You are not the author of this question');" ] } }],
+          "request": { "method": "PUT", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"text\": \"This must be rejected\",\n  \"options\": [\"A\", \"B\"],\n  \"correctAnswerIndex\": 0\n}", "options": { "raw": { "language": "json" } } }, "url": "{{apiUrl}}/questions/{{questionId}}" }
+        },
+        {
+          "name": "Author deletes own Question",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Author can delete own question', () => pm.response.to.have.status(200));" ] } }],
+          "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{authorToken}}" }], "url": "{{apiUrl}}/questions/{{questionId}}" }
+        }
+      ]
+    },
+    {
+      "name": "03 - Admin Quiz and Users",
+      "item": [
+        {
+          "name": "Author cannot create Quiz",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Author blocked from Quiz write', () => pm.response.to.have.status(403));" ] } }],
+          "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{authorToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"title\": \"Author must not create Quiz\",\n  \"description\": \"Permission test\"\n}", "options": { "raw": { "language": "json" } } }, "url": "{{apiUrl}}/quizzes" }
+        },
+        {
+          "name": "Admin creates Quiz",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Admin created Quiz', () => pm.response.to.have.status(201));", "pm.environment.set('quizId', pm.response.json()._id);" ] } }],
+          "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"title\": \"ASM03 Admin Quiz\",\n  \"description\": \"Admin authorization test\"\n}", "options": { "raw": { "language": "json" } } }, "url": "{{apiUrl}}/quizzes" }
+        },
+        {
+          "name": "Admin updates Quiz",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Admin can update Quiz', () => pm.response.to.have.status(200));" ] } }],
+          "request": { "method": "PUT", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"title\": \"Updated ASM03 Admin Quiz\",\n  \"description\": \"Updated by Admin\"\n}", "options": { "raw": { "language": "json" } } }, "url": "{{apiUrl}}/quizzes/{{quizId}}" }
+        },
+        {
+          "name": "Author cannot update Quiz",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Author blocked from Quiz update', () => pm.response.to.have.status(403));" ] } }],
+          "request": { "method": "PUT", "header": [{ "key": "Authorization", "value": "Bearer {{authorToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"title\": \"Blocked update\",\n  \"description\": \"Blocked\"\n}", "options": { "raw": { "language": "json" } } }, "url": "{{apiUrl}}/quizzes/{{quizId}}" }
+        },
+        {
+          "name": "Author cannot delete Quiz",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Author blocked from Quiz delete', () => pm.response.to.have.status(403));" ] } }],
+          "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{authorToken}}" }], "url": "{{apiUrl}}/quizzes/{{quizId}}" }
+        },
+        {
+          "name": "Author cannot GET users",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Author blocked from users', () => pm.response.to.have.status(403));" ] } }],
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{authorToken}}" }], "url": "{{baseUrl}}/users" }
+        },
+        {
+          "name": "Admin GET users",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Admin can GET users', () => pm.response.to.have.status(200));", "pm.expect(pm.response.json()).to.be.an('array');" ] } }],
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/users" }
+        },
+        {
+          "name": "Admin deletes Quiz",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Admin can delete Quiz', () => pm.response.to.have.status(200));" ] } }],
+          "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{apiUrl}}/quizzes/{{quizId}}" }
+        }
+      ]
+    }
+  ]
+}

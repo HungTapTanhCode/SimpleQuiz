@@ -1,0 +1,11 @@
+<%- include('../partials/header.hbs') %>
+<div class="page-heading mb-4"><p class="eyebrow mb-1">Question management</p><h1 class="h2 mb-0">Edit Question</h1></div>
+<form method="post" action="/questions/<%= question._id %>" class="bg-white border rounded-3 p-4 p-lg-5 form-panel" data-loading>
+  <input type="hidden" name="_method" value="PUT">
+  <div class="mb-3"><label class="form-label" for="text">Question Text</label><textarea class="form-control" id="text" name="text" rows="2" required><%= question.text %></textarea></div>
+  <div class="mb-3"><label class="form-label" for="options">Options <span class="text-secondary fw-normal">(comma separated)</span></label><input class="form-control" id="options" name="options" required value="<%= (question.options || []).join(', ') %>"></div>
+  <div class="mb-3"><label class="form-label" for="keywords">Keywords <span class="text-secondary fw-normal">(comma separated, optional)</span></label><input class="form-control" id="keywords" name="keywords" value="<%= (question.keywords || []).join(', ') %>"></div>
+  <div class="mb-4"><label class="form-label" for="correctAnswerIndex">Correct Answer Index</label><input class="form-control" id="correctAnswerIndex" name="correctAnswerIndex" type="number" min="0" required value="<%= question.correctAnswerIndex %>"><div class="form-text">Use zero for the first option.</div></div>
+  <div class="d-flex gap-2"><button class="btn btn-primary" type="submit" data-loading-text="Updating...">Update</button><a class="btn btn-light" href="/questions/<%= question._id %>">Cancel</a></div>
+</form>
+<%- include('../partials/footer.hbs') %>

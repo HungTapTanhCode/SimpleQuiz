@@ -1,0 +1,27 @@
+<%- include('../partials/header.hbs') %>
+<main class="auth-page">
+  <div class="auth-shell">
+    <section class="auth-story">
+      <span class="auth-kicker">Simple Quiz workspace</span>
+      <h1>Make every question count.</h1>
+      <p>Sign in to manage your question bank, build quizzes, and keep your learning content organized.</p>
+      <div class="auth-points"><span>✓</span> Role-aware access for Admins and Authors<br><span>✓</span> One secure workspace for your content</div>
+    </section>
+    <section class="auth-card">
+      <div class="auth-card-heading"><span class="brand-mark">Q</span><div><p class="eyebrow mb-1">Welcome back</p><h2>Sign in</h2></div></div>
+      <% if (registered) { %><div class="alert alert-success">Your account is ready. Sign in to continue.</div><% } %>
+      <% if (loggedOut) { %><div class="alert alert-info">You have signed out successfully.</div><% } %>
+      <% if (typeof message !== 'undefined' && message) { %><div class="alert alert-danger"><%= message %></div><% } %>
+      <form method="post" action="/login" class="auth-form">
+        <input type="hidden" name="next" value="<%= next || '/quizzes' %>">
+        <label class="form-label" for="username">Username</label>
+        <input class="form-control form-control-lg" id="username" name="username" required autocomplete="username" placeholder="e.g. alex" value="<%= typeof username !== 'undefined' ? username : '' %>">
+        <label class="form-label mt-3" for="password">Password</label>
+        <input class="form-control form-control-lg" id="password" name="password" type="password" required autocomplete="current-password" placeholder="Your password">
+        <button class="btn btn-primary btn-lg w-100 mt-4" type="submit">Sign in <span aria-hidden="true">→</span></button>
+      </form>
+      <p class="auth-switch">New to Simple Quiz? <a href="/register">Create an account</a></p>
+    </section>
+  </div>
+</main>
+<%- include('../partials/footer.hbs') %>

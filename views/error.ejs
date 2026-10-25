@@ -1,0 +1,8 @@
+<%- include('partials/header.hbs') %>
+<div class="bg-white border rounded-3 p-5 text-center">
+  <p class="eyebrow mb-2">Request error</p>
+  <h1 class="h3"><%= message %></h1>
+  <p class="text-secondary">Status: <%= error.status || 500 %></p>
+  <a class="btn btn-primary" href="/quizzes">Return to quizzes</a>
+</div>
+<%- include('partials/footer.hbs') %>

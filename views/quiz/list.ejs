@@ -1,0 +1,44 @@
+<%- include('../partials/header.hbs') %>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+  <div>
+    <p class="eyebrow mb-1">Question bank</p>
+    <h1 class="h2 mb-1">Quizzes</h1>
+    <p class="text-secondary mb-0">Create and organize assessments for your learners.</p>
+  </div>
+  <% if (currentUser && currentUser.admin) { %><a class="btn btn-primary" href="/quizzes/new">Create New Quiz</a><% } %>
+</div>
+
+<% if (!quizzes.length) { %>
+  <div class="empty-state bg-white border rounded-3 p-5 text-center">
+    <h2 class="h5">No quizzes yet</h2>
+    <p class="text-secondary mb-3">Create your first quiz to start building a question bank.</p>
+    <% if (currentUser && currentUser.admin) { %><a class="btn btn-outline-primary" href="/quizzes/new">Create New Quiz</a><% } else { %><a class="btn btn-outline-primary" href="/login">Sign in as Admin</a><% } %>
+  </div>
+<% } else { %>
+  <div class="table-responsive bg-white border rounded-3">
+    <table class="table align-middle mb-0">
+      <thead><tr><th>Quiz</th><th>Questions</th><th class="text-end">Actions</th></tr></thead>
+      <tbody>
+      <% quizzes.forEach(quiz => { %>
+        <tr>
+          <td>
+            <a class="link-dark fw-semibold" href="/quizzes/<%= quiz._id %>"><%= quiz.title %></a>
+            <div class="small text-secondary text-truncate table-description"><%= quiz.description %></div>
+          </td>
+          <td><span class="badge text-bg-light border"><%= (quiz.questions || []).length %></span></td>
+          <td class="text-end text-nowrap">
+            <a class="btn btn-sm btn-outline-secondary" href="/quizzes/<%= quiz._id %>">View</a>
+            <% if (currentUser && currentUser.admin) { %><a class="btn btn-sm btn-outline-primary" href="/quizzes/<%= quiz._id %>/edit">Edit</a>
+            <form class="d-inline" method="post" action="/quizzes/<%= quiz._id %>" data-confirm="Delete this quiz? This action cannot be undone.">
+              <input type="hidden" name="_method" value="DELETE">
+              <button class="btn btn-sm btn-outline-danger" type="submit" data-loading-text="Deleting...">Delete</button>
+            </form>
+            <% } %>
+          </td>
+        </tr>
+      <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
+<%- include('../partials/footer.hbs') %>

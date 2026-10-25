@@ -1,0 +1,21 @@
+<%- include('../partials/header.hbs') %>
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+  <div><p class="eyebrow mb-1">Quiz details</p><h1 class="h2 mb-2"><%= quiz.title %></h1><p class="text-secondary mb-0"><%= quiz.description %></p></div>
+  <div class="d-flex gap-2"><% if (currentUser && currentUser.admin) { %><a class="btn btn-primary" href="/quizzes/<%= quiz._id %>/edit">Edit Quiz</a><% } %><a class="btn btn-light" href="/quizzes">Back</a></div>
+</div>
+<section class="bg-white border rounded-3 p-4 mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-3"><h2 class="h5 mb-0">Questions</h2><span class="badge text-bg-primary"><%= (quiz.questions || []).length %></span></div>
+  <% if (!quiz.questions || !quiz.questions.length) { %><p class="text-secondary mb-0">This quiz has no questions yet.</p><% } else { %>
+    <ol class="list-group list-group-numbered list-group-flush">
+      <% quiz.questions.forEach(question => { %><li class="list-group-item px-0"><a class="link-dark" href="/questions/<%= question._id %>"><%= question.text %></a></li><% }) %>
+    </ol>
+  <% } %>
+</section>
+<% if (currentUser && currentUser.admin) { %><section class="bg-white border rounded-3 p-4">
+  <h2 class="h5 mb-3">Add an existing question</h2>
+  <% const available = allQuestions.filter(question => !(quiz.questions || []).some(item => String(item._id) === String(question._id))); %>
+  <% if (!available.length) { %><p class="text-secondary mb-0">All available questions are already in this quiz.</p><% } else { %>
+    <form method="post" action="/quizzes/<%= quiz._id %>/questions" class="row g-2 align-items-end" data-loading><div class="col-md-10"><label class="form-label" for="questionId">Question</label><select class="form-select" id="questionId" name="questionId" required><% available.forEach(question => { %><option value="<%= question._id %>"><%= question.text %></option><% }) %></select></div><div class="col-md-2"><button class="btn btn-outline-primary w-100" type="submit" data-loading-text="Adding...">Add</button></div></form>
+  <% } %>
+</section><% } %>
+<%- include('../partials/footer.hbs') %>

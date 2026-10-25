@@ -1,0 +1,25 @@
+<%- include('../partials/header.hbs') %>
+<main class="auth-page">
+  <div class="auth-shell auth-shell-compact">
+    <section class="auth-story">
+      <span class="auth-kicker">Start your workspace</span>
+      <h1>Build better quizzes, together.</h1>
+      <p>Create an Author account for questions or an Admin account for full quiz management.</p>
+      <div class="role-preview"><div><strong>Author</strong><span>Create and manage your own questions</span></div><div><strong>Admin</strong><span>Manage quizzes and review all users</span></div></div>
+    </section>
+    <section class="auth-card">
+      <div class="auth-card-heading"><span class="brand-mark">Q</span><div><p class="eyebrow mb-1">Get started</p><h2>Create account</h2></div></div>
+      <% if (typeof message !== 'undefined' && message) { %><div class="alert alert-danger"><%= message %></div><% } %>
+      <form method="post" action="/register" class="auth-form">
+        <label class="form-label" for="username">Username</label>
+        <input class="form-control form-control-lg" id="username" name="username" required autocomplete="username" placeholder="Choose a username" value="<%= typeof username !== 'undefined' ? username : '' %>">
+        <label class="form-label mt-3" for="password">Password</label>
+        <input class="form-control form-control-lg" id="password" name="password" type="password" minlength="6" required autocomplete="new-password" placeholder="At least 6 characters">
+        <label class="role-toggle mt-4"><input type="checkbox" name="admin" <%= typeof admin !== 'undefined' && admin ? 'checked' : '' %>><span class="role-toggle-copy"><strong>Register as Admin</strong><small>Admin can create, edit, and delete quizzes and view users.</small></span></label>
+        <button class="btn btn-primary btn-lg w-100 mt-4" type="submit">Create account <span aria-hidden="true">→</span></button>
+      </form>
+      <p class="auth-switch">Already have an account? <a href="/login">Sign in</a></p>
+    </section>
+  </div>
+</main>
+<%- include('../partials/footer.hbs') %>

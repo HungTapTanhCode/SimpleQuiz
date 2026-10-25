@@ -1,0 +1,3 @@
+/* Skeleton-compatible stylesheet path. The application also keeps the original
+   public/stylesheets/style.css path used by the existing EJS pages. */
+@import url('../stylesheets/style.css');
