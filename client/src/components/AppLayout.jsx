@@ -2,6 +2,7 @@ import { BookOpenCheck, HelpCircle, LayoutDashboard, LogOut, ShieldCheck, Users 
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../features/auth/authSlice';
+import AppFooter from './AppFooter';
 
 export default function AppLayout() {
   const user = useSelector(state => state.auth.user);
@@ -28,6 +29,7 @@ export default function AppLayout() {
       <div className="content-column">
         <header className="topbar"><div><span className="status-dot" /> Connected to SimpleQuiz API</div><span className="role-indicator"><ShieldCheck size={15} /> {user.admin ? 'Admin access' : 'Participant access'}</span></header>
         <main className="page-content"><Outlet /></main>
+        <AppFooter />
       </div>
     </div>
   );
